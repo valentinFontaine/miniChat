@@ -1,6 +1,7 @@
 <?php
     //Démarrage de la session pour retenir le mot de passe
     session_start();
+    $nb_msg_page = 10;
 ?>
 <!DOCTYPE html>
 
@@ -28,6 +29,7 @@
             <p><label>Message : </label><input type="input" name="message" value="" /></p>
             <p><input type="submit" value="Poster le message" /></p>
         </form>
+        <a href="miniChat.php">Actualiser</a>
 
         <?php 
             try
@@ -39,8 +41,26 @@
                 die('Erreur : ' . $e->getMessage());
             }
 
+            if (isset($_GET['page']))
+            {
+                $num_page = (int) $_GET['page'];
+                $lim_min = $nb_msg_page*($num_page-1);
+                $lim_max = $nb_msg_page*($num_page);
+            }
+            else
+            {
+                $lim_min = 0;
+                $lim_max = 10;
+            }
+
             //Affichage de tous les messages envoyés par la base
-            $requete = $bdd->query('SELECT pseudo, message, DATE_FORMAT(date_message, \'%d/%m/%Y - %Hh%imin%ss\') as date_message_fr FROM messages ORDER BY ID DESC');
+            $requete = $bdd->prepare('SELECT pseudo, message, DATE_FORMAT(date_message, \'%d/%m/%Y - %Hh%imin%ss\') as date_message_fr FROM messages ORDER BY ID DESC LIMIT :lim_min,:lim_max');
+            $requete->bindValue(':lim_min', intval($lim_min), PDO::PARAM_INT);
+            $requete->bindValue(':lim_max', intval($lim_max), PDO::PARAM_INT);
+
+            $requete->execute();
+            
+            
             while ($message = $requete->fetch())
             {
                 if(isset($message['pseudo']) AND isset($message['message']))
@@ -48,6 +68,19 @@
                     echo '<p><strong>' . htmlspecialchars($message['pseudo']) . '</strong> à '. $message['date_message_fr'] . ' : ' . htmlspecialchars($message['message']) . '</p>';
                 } 
 
+            }
+
+            //Affichage du nombre de page
+            $requete = $bdd->query('SELECT COUNT(*) AS nb_messages FROM messages');
+
+            while ($nb_ligne = $requete->fetch())
+            {
+                echo '<p> Pages : ';
+                for($i = 1; $i <= ceil(((int)$nb_ligne['nb_messages']) / $nb_msg_page) ; $i++)
+                {
+                    echo '<a href="miniChat.php?page=' . $i .'">' . $i . '</a>   ';
+                }
+                echo '</p>';
             }
         ?>
 
