@@ -24,12 +24,12 @@
             }
 
             //Affichage de tous les messages envoyés par la base
-            $requete = $bdd->query('SELECT pseudo, message FROM messages');
+            $requete = $bdd->query('SELECT pseudo, message, DATE_FORMAT(date_message, \'%d/%m/%Y - %Hh%imin%ss\') as date_message_fr FROM messages ORDER BY ID DESC');
             while ($message = $requete->fetch())
             {
                 if(isset($message['pseudo']) AND isset($message['message']))
                 {
-                    echo '<p><strong>' . htmlspecialchars($message['pseudo']) . '</strong> : ' . htmlspecialchars($message['message']) . '</p>';
+                    echo '<p><strong>' . htmlspecialchars($message['pseudo']) . '</strong> à '. $message['date_message_fr'] . ' : ' . htmlspecialchars($message['message']) . '</p>';
                 } 
 
             }
