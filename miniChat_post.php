@@ -1,4 +1,7 @@
 <?php
+//Démarrage de la session 
+session_start();
+
 //Connexion à la base de donnée
 try
 { 
@@ -20,6 +23,8 @@ if (isset($_POST['pseudo']) AND isset($_POST['message']) )
     {
         $requete = $bdd->prepare('INSERT INTO messages(pseudo, message, date_message) VALUES(:pseudo, :message, NOW())');
         $requete->execute(array('pseudo' => $pseudo, 'message' => $message));
+
+        $_SESSION['pseudo'] = $pseudo;
     }
 }
 

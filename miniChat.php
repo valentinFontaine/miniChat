@@ -1,3 +1,7 @@
+<?php
+    //Démarrage de la session pour retenir le mot de passe
+    session_start();
+?>
 <!DOCTYPE html>
 
 <html>
@@ -8,7 +12,19 @@
 
     <body>
         <form action="miniChat_post.php" method="POST">
-            <p><label>Pseudo : </label><input type="input" name="pseudo" value="" /></p>
+        <?php
+            if (isset($_SESSION['pseudo']) OR $_SESSION['pseudo'] != '')
+            {
+                $pseudo = htmlspecialchars($_SESSION['pseudo']);
+            }
+            else 
+            {
+                $pseudo = "";
+            }
+?>
+
+            
+        <p><label>Pseudo : </label><input type="input" name="pseudo" value="<?php echo $pseudo; ?>" /></p>
             <p><label>Message : </label><input type="input" name="message" value="" /></p>
             <p><input type="submit" value="Poster le message" /></p>
         </form>
