@@ -65,7 +65,14 @@
             {
                 if(isset($message['pseudo']) AND isset($message['message']))
                 {
-                    echo '<p><strong>' . htmlspecialchars($message['pseudo']) . '</strong> à '. $message['date_message_fr'] . ' : ' . htmlspecialchars($message['message']) . '</p>';
+                    //traitement du message pour afficher le BBCode
+                    $message_traite = nl2br(htmlspecialchars(stripslashes($message['message'])));
+                    $message_traite = preg_replace('#\[b\](.+)\[/b\]#isU', '<strong>$1</strong>', $message_traite);
+                    $message_traite = preg_replace('#\[i\](.+)\[/i\]#isU', '<em>$1</em>', $message_traite);
+                    $message_traite = preg_replace('#\[color=(.+)\](.+)\[/color\]#isU','<span style="color:$1">$2</span>', $message_traite);
+                    $message_traite = preg_replace('#(http|https):[a-z0-9._/-]+(\?)?([a-z0-9]+=[a-z0-9]+(&(amp;)?)?)*#i', '<a href="$0">$0</a>', $message_traite);
+
+                    echo '<p><strong>' . htmlspecialchars($message['pseudo']) . '</strong> à '. $message['date_message_fr'] . ' : ' . $message_traite . '</p>';
                 } 
 
             }
@@ -76,9 +83,15 @@
             while ($nb_ligne = $requete->fetch())
             {
                 echo '<p> Pages : ';
-                for($i = 1; $i <= ceil(((int)$nb_ligne['nb_messages']) / $nb_msg_page) ; $i++)
+                $i_max = ceil(((int)$nb_ligne['nb_messages'])/ $nb_msg_page);
+                for($i = 1; $i <= $i_max  ; $i++)
                 {
-                    echo '<a href="miniChat.php?page=' . $i .'">' . $i . '</a>   ';
+                    echo '<a href="miniChat.php?page=' . $i .'">' . $i . '</a>';
+
+                    if ($i < $i_max) 
+                    {
+                        echo '  -  ';
+                    }
                 }
                 echo '</p>';
             }

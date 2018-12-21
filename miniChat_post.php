@@ -16,8 +16,8 @@ catch(Exception $e)
 //envoi du message à la base de données (si il y en a un) 
 if (isset($_POST['pseudo']) AND isset($_POST['message']) ) 
 {
-    $pseudo = htmlspecialchars($_POST['pseudo']);
-    $message = htmlspecialchars($_POST['message']);
+    $pseudo = ($_POST['pseudo']);
+    $message = ($_POST['message']);
 
     if ($pseudo != '' AND $message != '')
     {
