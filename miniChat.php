@@ -12,20 +12,24 @@
     </head>
 
     <body>
-        <form action="miniChat_post.php" method="POST">
+
         <?php
-            if (isset($_SESSION['pseudo']) OR $_SESSION['pseudo'] != '')
+            if (isset($_SESSION['pseudo']) AND isset($_SESSION['id']))
             {
-                $pseudo = htmlspecialchars($_SESSION['pseudo']);
+                echo '<p> Bonjour ' . $_SESSION['pseudo'] . '</p>';
             }
-            else 
+           else
             {
-                $pseudo = "";
+                header('Location: connexion.php?erreur=minichat');
             }
 ?>
 
+        <form action="sign_out.php" method="POST">
+            <p><input type="submit" value="se deconnecter" /></p>
+        </form>
+
+        <form action="miniChat_post.php" method="POST">
             
-        <p><label>Pseudo : </label><input type="input" name="pseudo" value="<?php echo $pseudo; ?>" /></p>
             <p><label>Message : </label><input type="input" name="message" value="" /></p>
             <p><input type="submit" value="Poster le message" /></p>
         </form>
@@ -54,12 +58,12 @@
             }
 
             //Affichage de tous les messages envoyés par la base
-            $requete = $bdd->prepare('SELECT pseudo, message, DATE_FORMAT(date_message, \'%d/%m/%Y - %Hh%imin%ss\') as date_message_fr FROM messages ORDER BY ID DESC LIMIT :lim_min,:lim_max');
+            
+            $requete = $bdd->prepare('SELECT members.pseudo as pseudo, messages.message as message, DATE_FORMAT(messages.date_message, \'%d/%m/%Y - %Hh%imin%ss\') as date_message_fr FROM messages INNER JOIN members ON members.id=messages.id_pseudo ORDER BY messages.date_message DESC LIMIT :lim_min,:lim_max');
             $requete->bindValue(':lim_min', intval($lim_min), PDO::PARAM_INT);
             $requete->bindValue(':lim_max', intval($lim_max), PDO::PARAM_INT);
 
             $requete->execute();
-            
             
             while ($message = $requete->fetch())
             {
@@ -96,7 +100,6 @@
                 echo '</p>';
             }
         ?>
-
 
     </body>
 </html>

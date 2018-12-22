@@ -12,21 +12,23 @@ catch(Exception $e)
     die('Erreur : ' . $e->getMessage());
 }
 
-
 //envoi du message à la base de données (si il y en a un) 
-if (isset($_POST['pseudo']) AND isset($_POST['message']) ) 
+if (isset($_SESSION['id'])  AND isset($_POST['message']))
 {
-    $pseudo = ($_POST['pseudo']);
     $message = ($_POST['message']);
 
-    if ($pseudo != '' AND $message != '')
+    if ($message != '')
     {
-        $requete = $bdd->prepare('INSERT INTO messages(pseudo, message, date_message) VALUES(:pseudo, :message, NOW())');
-        $requete->execute(array('pseudo' => $pseudo, 'message' => $message));
-
-        $_SESSION['pseudo'] = $pseudo;
+        $requete = $bdd->prepare('INSERT INTO messages(id_pseudo, message, date_message) VALUES(:id_pseudo, :message, NOW())');
+        $requete->execute(array('id_pseudo' => $_SESSION['id'], 'message' => $message));
     }
+
+    header('Location: miniChat.php');
+}
+else
+{
+    header('Location: connexion.php');
 }
 
-header('Location: miniChat.php');
+
 ?>
